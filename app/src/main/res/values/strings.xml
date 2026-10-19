@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Lite Launcher</string>
+    <string name="settings">Settings</string>
+    <string name="hidden_apps">Hidden apps</string>
+    <string name="move">Move</string>
+    <string name="hide">Hide</string>
+    <string name="app_info">App info</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="unhide">Show again</string>
+    <string name="no_hidden">No hidden apps</string>
+    <string name="cannot_open">Cannot open app</string>
+    <string name="move_hint">Use arrows to move · OK to finish</string>
+</resources>

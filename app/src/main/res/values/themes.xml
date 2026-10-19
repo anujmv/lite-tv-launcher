@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.Lite" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@drawable/bg</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:colorAccent">#FFFFFF</item>
+    </style>
+</resources>

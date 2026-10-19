@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="edge">48dp</dimen>
+    <dimen name="tile_w">160dp</dimen>
+    <dimen name="tile_h">90dp</dimen>
+    <dimen name="tile_gap">10dp</dimen>
+</resources>
