@@ -11,8 +11,8 @@ android {
         applicationId = "dev.lite.launcher"
         minSdk = 21
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     // Release key comes from ~/.gradle/gradle.properties; without it, release builds use the debug key.

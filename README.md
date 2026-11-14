@@ -17,6 +17,7 @@ Plain Android Views + Kotlin. No AndroidX, no libraries, no network access, no t
 - Clock and date
 - Long-press an app: **Move**, **Hide**, **App info**, **Uninstall**
 - Move mode: arrows shift the tile, OK saves
+- **Inputs** button: switch to HDMI / AV / Tuner (lists only the TV's physical sources)
 - Hidden apps list (eye icon) to bring apps back
 - Settings shortcut (gear icon)
 - Updates automatically when apps are installed or removed
@@ -29,7 +30,7 @@ Plain Android Views + Kotlin. No AndroidX, no libraries, no network access, no t
 
    ```bash
    adb connect <TV_IP>:5555
-   adb install lite-tv-launcher-v1.0.apk
+   adb install lite-tv-launcher-v1.1.apk
    adb shell cmd package set-home-activity dev.lite.launcher/.MainActivity
    ```
 
@@ -50,6 +51,15 @@ adb shell pm disable-user --user 0 com.mitv.tvhome.atv
 ```
 
 Undo with `adb shell pm enable <package>`.
+
+Some TVs (Xiaomi included) re-enable disabled launchers after a reboot or update. To remove them for your user instead (system copy stays, so it is reversible):
+
+```bash
+adb shell pm uninstall -k --user 0 com.google.android.tvlauncher
+adb shell pm uninstall -k --user 0 com.mitv.tvhome.atv
+```
+
+Restore with `adb shell cmd package install-existing <package>`.
 
 ## Build
 

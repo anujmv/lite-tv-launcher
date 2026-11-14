@@ -8,7 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.media.tv.TvContract
+import android.media.tv.TvInputInfo
+import android.media.tv.TvInputManager
 import android.provider.Settings
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -45,7 +49,8 @@ class MainActivity : Activity() {
 
         findViewById<View>(R.id.settings).setOnClickListener { launch(Intent(Settings.ACTION_SETTINGS)) }
         findViewById<View>(R.id.hidden).setOnClickListener { showHidden() }
-        listOf(R.id.settings, R.id.hidden).forEach { id ->
+        findViewById<View>(R.id.inputs).setOnClickListener { showInputs() }
+        listOf(R.id.inputs, R.id.settings, R.id.hidden).forEach { id ->
             findViewById<View>(id).setOnFocusChangeListener { v, focused ->
                 if (focused) title.text = v.contentDescription
             }
@@ -170,6 +175,37 @@ class MainActivity : Activity() {
             }
             .show()
     }
+
+    // HDMI/AV/tuner sources; picking one opens it in the system TV app via a passthrough URI.
+    private fun showInputs() {
+        val tim = getSystemService(Context.TV_INPUT_SERVICE) as? TvInputManager
+        val all = tim?.tvInputList.orEmpty()
+        // Streaming apps (Play Movies, Zee5...) register inputs too; keep only the vendor package behind HDMI/AV.
+        val hwPkgs = all.filter { it.isPassthroughInput }.map { it.serviceInfo.packageName }.toSet()
+        val inputs = all
+            .filter { it.serviceInfo.packageName in hwPkgs }
+            .filter { Build.VERSION.SDK_INT < 23 || it.parentId == null }
+            .filter { Build.VERSION.SDK_INT < 24 || !it.isHidden(this) }
+            .sortedWith(compareBy({ it.type != TvInputInfo.TYPE_HDMI }, { it.type == TvInputInfo.TYPE_TUNER }, { label(it) }))
+            .distinctBy { label(it) } // chipsets expose several tuners with the same name
+        if (inputs.isEmpty()) {
+            Toast.makeText(this, R.string.no_inputs, Toast.LENGTH_SHORT).show()
+            return
+        }
+        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle(R.string.inputs)
+            .setItems(inputs.map { label(it) }.toTypedArray()) { _, which ->
+                val input = inputs[which]
+                val uri = if (input.isPassthroughInput) TvContract.buildChannelUriForPassthroughInput(input.id)
+                    else TvContract.buildChannelsUriForInput(input.id)
+                launch(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
+            .show()
+    }
+
+    private fun label(input: TvInputInfo): String =
+        ((if (Build.VERSION.SDK_INT >= 24) input.loadCustomLabel(this)?.takeIf { it.isNotBlank() } else null)
+            ?: input.loadLabel(this)).toString()
 
     private fun tileOf(app: App): View? = (0 until grid.childCount).map { grid.getChildAt(it) }.find { it.tag === app }
 
